@@ -1,10 +1,6 @@
-
-
-
 const http = require('http');
 const EventEmitter = require('events');
 const logger = require('./logger');
-
 
 class AppServer extends EventEmitter {
     constructor() {
@@ -16,7 +12,6 @@ class AppServer extends EventEmitter {
         this.server = http.createServer((req, res) => {
             this.emit('request:received', { url: req.url, method: req.method });
 
-         
             if (req.url.startsWith('/order/')) {
                 const orderId = req.url.split('/')[2];
                 orderHandler.processOrder(orderId);
@@ -55,7 +50,6 @@ class OrderHandler extends EventEmitter {
     }
 }
 
-
 function calculatePi(digits) {
     let pi = 0;
     for (let i = 0; i < 1000000; i++) {
@@ -67,7 +61,6 @@ function calculatePi(digits) {
     }
     return (pi * 4).toFixed(digits);
 }
-
 
 class UserTracker extends EventEmitter {
     trackAction(userId, action, metadata) {
@@ -82,43 +75,14 @@ class UserTracker extends EventEmitter {
     }
 }
 
-
 const app = new AppServer();
 const orderHandler = new OrderHandler();
 const tracker = new UserTracker();
 
-
 logger.setupLogger(app);
-
 
 app.on('server:started', (port) => {
     console.log('Сервер запущен на порту ' + port);
-
-function calculatePi(digits) {
-    let pi = 0;
-    for (let k = 0; k < 100; k++) {
-        pi += (1 / Math.pow(16, k)) * (
-            4 / (8 * k + 1) -
-            2 / (8 * k + 4) -
-            1 / (8 * k + 5) -
-            1 / (8 * k + 6)
-        );
-    }
-    return pi.toFixed(digits);
-}
-
-const fio = 'Седура Анна';
-const group = '477';
-const journalNumber = 20;
-
-const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(
-        '<h1>' + fio + '</h1>' +
-        '<p>Группа: ' + group + '</p>' +
-        '<p>Число Пи (' + journalNumber + ' знаков): ' + calculatePi(journalNumber) + '</p>'
-    );
- origin/main
 });
 
 app.on('request:received', (data) => {
@@ -142,7 +106,6 @@ orderHandler.on('order:complete', (data) => {
     console.log('[order:complete] Заказ #' + data.orderId + ' завершён на сумму ' + data.sum + ' руб. PI = ' + pi);
 });
 
-
 tracker.on('user:action', (data) => {
     console.log('Пользователь ' + data.userId + ' совершил действие "' + data.action + '"');
     console.log('Время: ' + data.timestamp);
@@ -155,9 +118,7 @@ tracker.trackAction('user1', 'login', { ip: '192.168.1.1' });
 tracker.trackAction('user2', 'purchase', { item: 'book', price: 500 });
 tracker.trackAction('user3', 'logout', { reason: 'timeout' });
 
-
 app.start(3000);
-
 
 setTimeout(() => {
     app.stop();
