@@ -1,4 +1,10 @@
 node_modules/
-.DS_Store
+logs.txt
 *.log
+.DS_Store
 .env
+test-data/
+test-data-promises/
+data/
+data-promises/
+hybrid-data/
