@@ -1,5 +1,8 @@
 node_modules/
-.DS_Store
-*.log
-.env
 logs.txt
+*.log
+.DS_Store
+.env
+student_*.txt
+project_*/
+report_*.json
