@@ -13,8 +13,6 @@ logs.txt
 student_*.txt
 project_*/
 report_*.json
-
-
 test-data/
 test-data-promises/
 hybrid-data/
