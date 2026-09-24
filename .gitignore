@@ -3,8 +3,6 @@ logs.txt
 *.log
 .DS_Store
 .env
-test-data/
-test-data-promises/
-data/
-data-promises/
-hybrid-data/
+student_*.txt
+project_*/
+report_*.json
