@@ -1,8 +1,15 @@
+
 node_modules/
+
+
 logs.txt
 *.log
+
+
 .DS_Store
 .env
+
+
 student_*.txt
 project_*/
 report_*.json
