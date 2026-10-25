@@ -16,3 +16,6 @@ report_*.json
 test-data/
 test-data-promises/
 hybrid-data/
+http-lab-anna/big.txt
+http-lab-anna/public/
+http-lab-anna/access.log
