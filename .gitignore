@@ -16,3 +16,5 @@ report_*.json
 test-data/
 test-data-promises/
 hybrid-data/
+mysql-lab-anna/.env
+mysql-lab-anna/node_modules/
