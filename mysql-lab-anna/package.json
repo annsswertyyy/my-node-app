@@ -1,0 +1,20 @@
+{
+  "name": "mysql-lab-anna",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "koa": "^3.2.1",
+    "koa-bodyparser": "^4.4.1",
+    "koa-router": "^14.0.0",
+    "mysql2": "^3.24.6"
+  }
+}
