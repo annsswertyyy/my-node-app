@@ -16,3 +16,5 @@ report_*.json
 test-data/
 test-data-promises/
 hybrid-data/
+mongodb-lab-anna/.env
+mongodb-lab-anna/node_modules/
