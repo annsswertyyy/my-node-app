@@ -16,3 +16,9 @@ report_*.json
 test-data/
 test-data-promises/
 hybrid-data/
+stream-lab-anna/input.txt
+stream-lab-anna/out-*.txt
+stream-lab-anna/students.csv
+stream-lab-anna/errors.log
+stream-lab-anna/big.txt
+stream-lab-anna/public/
