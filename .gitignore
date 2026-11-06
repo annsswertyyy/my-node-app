@@ -16,3 +16,5 @@ report_*.json
 test-data/
 test-data-promises/
 hybrid-data/
+os-lab-anna/system-report.json
+os-lab-anna/monitor.log
