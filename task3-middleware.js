@@ -1,65 +1,80 @@
-const Koa = require('koa');
-const Router = require('koa-router');
-const bodyParser = require('koa-bodyparser');
+const express = require('express');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 
-const app = new Koa();
-const router = new Router();
+const app = express();
 const PORT = 3000;
 
-let users = [
-    { id: 1, name: 'Иванов Иван', group: 'ББМО-01-23' }
-];
+app.use(express.json());
+app.use(compression());
 
+const limiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 100,
+    message: { error: 'Слишком много запросов', status: 429 },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+app.use(limiter);
 
-app.use(async (ctx, next) => {
+app.use((req, res, next) => {
     const start = Date.now();
     const now = new Date().toLocaleString('ru-RU');
-    await next();
-    const ms = Date.now() - start;
-    console.log(`[${now}] ${ctx.method} ${ctx.url} - ${ms}ms`);
+    res.on('finish', () => {
+        const ms = Date.now() - start;
+        console.log(`[${now}] ${req.method} ${req.url} ${res.statusCode} - ${ms}ms`);
+    });
+    next();
 });
 
+let books = [
+    { id: 1, title: 'Война и мир', author: 'Толстой', year: 1869 }
+];
+let nextId = 2;
 
-app.use(async (ctx, next) => {
-    try {
-        await next();
-    } catch (err) {
-        ctx.status = err.status || 500;
-        ctx.body = {
-            error: err.message || 'Внутренняя ошибка сервера',
-            status: ctx.status
-        };
+app.get('/api/books', (req, res) => {
+    res.json(books);
+});
+
+app.get('/api/books/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const book = books.find(b => b.id === id);
+    if (!book) {
+        const err = new Error('Книга не найдена');
+        err.status = 404;
+        throw err;
     }
+    res.json(book);
 });
 
-async function auth(ctx, next) {
-    const authHeader = ctx.headers['authorization'];
-    if (!authHeader) {
-        ctx.status = 401;
-        ctx.body = { error: 'Не авторизован', status: 401 };
-        return;
+app.post('/api/books', (req, res) => {
+    const { title, author, year } = req.body;
+    if (!title || !author || !year) {
+        return res.status(400).json({ error: 'Неверные данные', status: 400 });
     }
-    await next();
-}
-
-
-router.get('/api/users', async (ctx) => {
-    ctx.body = users;
+    const book = { id: nextId++, title, author, year };
+    books.push(book);
+    res.status(201).json(book);
 });
 
-
-router.get('/protected', auth, async (ctx) => {
-    ctx.body = { message: 'Доступ разрешён' };
-});
-
-
-router.get('/error', async (ctx) => {
+app.get('/error', (req, res) => {
     throw new Error('Внутренняя ошибка сервера');
 });
 
-app.use(bodyParser());
-app.use(router.routes());
-app.use(router.allowedMethods());
+app.get('/async-error', async (req, res, next) => {
+    try {
+        await Promise.reject(new Error('Асинхронная ошибка'));
+    } catch (err) {
+        next(err);
+    }
+});
+
+app.use((err, req, res, next) => {
+    res.status(err.status || 500).json({
+        error: err.message || 'Внутренняя ошибка сервера',
+        status: err.status || 500
+    });
+});
 
 app.listen(PORT, () => {
     console.log('Сервер запущен на порту ' + PORT);

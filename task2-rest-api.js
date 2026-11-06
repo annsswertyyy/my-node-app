@@ -1,70 +1,68 @@
-const Koa = require('koa');
-const Router = require('koa-router');
-const bodyParser = require('koa-bodyparser');
-
-const app = new Koa();
-const router = new Router();
+const express = require('express');
+const app = express();
 const PORT = 3000;
 
-let users = [
-    { id: 1, name: 'Иванов Иван', group: 'ББМО-01-23' }
+app.use(express.json());
+
+let books = [
+    { id: 1, title: 'Война и мир', author: 'Толстой', year: 1869 }
 ];
 let nextId = 2;
 
-router.get('/api/users', async (ctx) => {
-    ctx.body = users;
+app.get('/api/books', (req, res) => {
+    res.json(books);
 });
 
-
-router.post('/api/users', async (ctx) => {
-    const { name, group } = ctx.request.body;
-    if (!name || !group) {
-        ctx.status = 400;
-        ctx.body = { error: 'Неверные данные', status: 400 };
-        return;
+app.get('/api/books/search', (req, res) => {
+    const author = req.query.author;
+    if (!author) {
+        return res.status(400).json({ error: 'Укажите параметр author' });
     }
-    const user = { id: nextId++, name, group };
-    users.push(user);
-    ctx.status = 201;
-    ctx.body = user;
+    const result = books.filter(b => b.author.toLowerCase().includes(author.toLowerCase()));
+    res.json(result);
 });
 
-
-router.put('/api/users/:id', async (ctx) => {
-    const id = Number(ctx.params.id);
-    const user = users.find(u => u.id === id);
-    if (!user) {
-        ctx.status = 404;
-        ctx.body = { error: 'Пользователь не найден', status: 404 };
-        return;
+app.get('/api/books/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const book = books.find(b => b.id === id);
+    if (!book) {
+        return res.status(404).json({ error: 'Книга не найдена' });
     }
-    const { name, group } = ctx.request.body;
-    if (!name || !group) {
-        ctx.status = 400;
-        ctx.body = { error: 'Неверные данные', status: 400 };
-        return;
-    }
-    user.name = name;
-    user.group = group;
-    ctx.body = user;
+    res.json(book);
 });
 
+app.post('/api/books', (req, res) => {
+    const { title, author, year } = req.body;
+    if (!title || !author || !year) {
+        return res.status(400).json({ error: 'Неверные данные' });
+    }
+    const book = { id: nextId++, title, author, year };
+    books.push(book);
+    res.status(201).json(book);
+});
 
-router.delete('/api/users/:id', async (ctx) => {
-    const id = Number(ctx.params.id);
-    const index = users.findIndex(u => u.id === id);
+app.put('/api/books/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const book = books.find(b => b.id === id);
+    if (!book) {
+        return res.status(404).json({ error: 'Книга не найдена' });
+    }
+    const { title, author, year } = req.body;
+    if (title) book.title = title;
+    if (author) book.author = author;
+    if (year) book.year = year;
+    res.json(book);
+});
+
+app.delete('/api/books/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const index = books.findIndex(b => b.id === id);
     if (index === -1) {
-        ctx.status = 404;
-        ctx.body = { error: 'Пользователь не найден', status: 404 };
-        return;
+        return res.status(404).json({ error: 'Книга не найдена' });
     }
-    users.splice(index, 1);
-    ctx.body = { message: 'Пользователь удалён' };
+    books.splice(index, 1);
+    res.json({ message: 'Книга удалена' });
 });
-
-app.use(bodyParser());
-app.use(router.routes());
-app.use(router.allowedMethods());
 
 app.listen(PORT, () => {
     console.log('Сервер запущен на порту ' + PORT);
